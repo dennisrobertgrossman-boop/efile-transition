@@ -2,95 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#05010d">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="description" content="A cyberpunk grid-runner stress test: collect data shards while your controls get scrambled every 30 to 45 seconds.">
-<title>GLITCH//GRID</title>
+<meta name="description" content="Three cyberpunk stress-test games. In each one the rules shift under you every few seconds.">
+<title>GLITCH//ARCADE</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305010d'/%3E%3Cpath d='M16 4 28 16 16 28 4 16Z' fill='none' stroke='%2300f0ff' stroke-width='3'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%23ff2bd6'/%3E%3C/svg%3E">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="app">
-  <header id="hud">
-    <div class="stats">
-      <div class="stat"><span class="lbl">SCORE</span><span class="val" id="score">0</span></div>
-      <div class="stat"><span class="lbl">BEST</span><span class="val" id="best">0</span></div>
-      <div class="stat"><span class="lbl">MULT</span><span class="val mag" id="mult">x1</span></div>
-      <div class="stat"><span class="lbl">LEVEL</span><span class="val" id="level">1</span></div>
-      <div class="stat"><span class="lbl">INTEGRITY</span><span class="val" id="lives" aria-label="lives"><i></i><i></i><i></i></span></div>
-    </div>
-    <div class="scramble" id="scrambleBox">
-      <span class="lbl" id="scrambleLbl">NEXT SCRAMBLE</span>
-      <div class="bar"><div id="scrambleBar"></div></div>
-    </div>
-  </header>
-
-  <div id="main">
-    <div id="stage">
-      <canvas id="game" aria-label="Game board"></canvas>
-      <div id="banner" aria-live="polite"></div>
-    </div>
-
-    <div id="controls">
-      <div id="legend" aria-label="Current control mapping"></div>
-      <div id="pad">
-        <button class="pb" data-d="0" style="grid-area:u" aria-label="Up arrow"></button>
-        <button class="pb" data-d="3" style="grid-area:l" aria-label="Left arrow"></button>
-        <button class="pb" data-d="1" style="grid-area:r" aria-label="Right arrow"></button>
-        <button class="pb" data-d="2" style="grid-area:d" aria-label="Down arrow"></button>
-        <div class="hub" style="grid-area:c"></div>
-      </div>
-      <div id="sys">
-        <button id="btnPause" class="sb" aria-label="Pause">II</button>
-        <button id="btnMute" class="sb" aria-label="Toggle sound">SND</button>
-      </div>
-    </div>
+<main id="hub">
+  <h1 class="glitch" data-t="GLITCH//ARCADE">GLITCH//ARCADE</h1>
+  <p class="tag">THREE NEURAL STRESS TESTS</p>
+  <div class="cards">
+    <a class="card" href="grid.html" style="--k:#00f0ff">
+      <span class="no">TEST 01</span>
+      <h2>GLITCH//GRID</h2>
+      <span class="twist">THE ARROWS GET REWIRED</span>
+      <p>Steer a runner across the grid, collect data shards and grow your trail. Every 30–45 seconds each arrow starts steering in a different direction.</p>
+      <span class="go">PLAY</span>
+    </a>
+    <a class="card" href="chroma.html" style="--k:#ff2bd6">
+      <span class="no">TEST 02</span>
+      <h2>CHROMA//LIE</h2>
+      <span class="twist">THE RULE GETS REWRITTEN</span>
+      <p>A colour word flashes up in the wrong ink. Hit the right colour button before time runs out — but the rule for which colour is "right" keeps changing, and the buttons swap places.</p>
+      <span class="go">PLAY</span>
+    </a>
+    <a class="card" href="vertigo.html" style="--k:#39ff88">
+      <span class="no">TEST 03</span>
+      <h2>VERTIGO//DRIFT</h2>
+      <span class="twist">THE WORLD GETS ROTATED</span>
+      <p>Glide around an arena, grab shards and dodge hunter drones. Every 30–45 seconds the whole arena rotates or mirrors, while your arrows stay wired to the old world.</p>
+      <span class="go">PLAY</span>
+    </a>
   </div>
-
-  <section id="ovTitle" class="overlay show">
-    <div class="panel">
-      <h1 class="glitch" data-t="GLITCH//GRID">GLITCH//GRID</h1>
-      <p class="tag">NEURAL STRESS TEST v1.0</p>
-      <ul class="how">
-        <li><b class="cy">◆</b> Steer the runner with the four arrows. Collect data shards. The trail grows.</li>
-        <li><b class="mg">◆</b> Every 30–45 seconds the arrows are <em>rewired</em>. The new wiring flashes for a few seconds — memorise it.</li>
-        <li><b class="rd">◆</b> Walls, your own trail and red ICE nodes cost integrity. Three hits and you are flatlined.</li>
-        <li><b class="gr">◆</b> Green stabilisers restore normal controls. Gold cores are worth five shards.</li>
-      </ul>
-      <button id="btnAssist" class="toggle" aria-pressed="false">ASSIST: OFF <small>(always show wiring)</small></button>
-      <button id="btnStart" class="cta">JACK IN</button>
-      <p class="keys">Keyboard: arrows or WASD · Space = pause · M = sound<br>Touch: on-screen pad or swipe</p>
-    </div>
-  </section>
-
-  <section id="ovPause" class="overlay">
-    <div class="panel small">
-      <h2>PAUSED</h2>
-      <button id="btnResume" class="cta">RESUME</button>
-      <button id="btnQuit" class="toggle">ABORT RUN</button>
-    </div>
-  </section>
-
-  <section id="ovOver" class="overlay">
-    <div class="panel small">
-      <h2 class="glitch rd" data-t="FLATLINED">FLATLINED</h2>
-      <p id="newBest" class="newbest">NEW BEST</p>
-      <dl class="res">
-        <dt>SCORE</dt><dd id="rScore">0</dd>
-        <dt>BEST</dt><dd id="rBest">0</dd>
-        <dt>SHARDS</dt><dd id="rShards">0</dd>
-        <dt>SCRAMBLES SURVIVED</dt><dd id="rScr">0</dd>
-        <dt>TIME</dt><dd id="rTime">0:00</dd>
-      </dl>
-      <button id="btnAgain" class="cta">RUN AGAIN</button>
-      <button id="btnMenu" class="toggle">MAIN MENU</button>
-    </div>
-  </section>
-</div>
+  <p class="foot">WORKS WITH KEYBOARD AND TOUCH</p>
+</main>
 <div id="fx" aria-hidden="true"></div>
-<script src="game.js"></script>
 </body>
 </html>
