@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#05010d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="A cyberpunk memory test: watch a sequence of arrows, then enter it under a rule that keeps being rewritten.">
+<title>ECHO//LOCK</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305010d'/%3E%3Cpath d='M16 4 28 16 16 28 4 16Z' fill='none' stroke='%2300f0ff' stroke-width='3'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%23ff2bd6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+#stage { flex-direction: column; gap: clamp(6px, 2vh, 18px); padding: 8px 14px; }
+#banner { top: 40%; }
+#card { width: min(100%, 420px); height: clamp(90px, 26vh, 200px); display: flex; align-items: center; justify-content: center;
+  background: #07031a; border: 1px solid rgba(0, 240, 255, .55); box-shadow: 0 0 22px rgba(0, 240, 255, .25), inset 0 0 40px rgba(0, 0, 0, .6);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px); }
+#card svg { height: 62%; width: auto; aspect-ratio: 1; fill: var(--cy); filter: drop-shadow(0 0 14px var(--cy)); animation: pop .14s ease-out 1; }
+#card.mine svg { fill: var(--mg); filter: drop-shadow(0 0 14px var(--mg)); }
+#card.good { border-color: var(--gr); box-shadow: 0 0 30px rgba(57, 255, 136, .6); }
+#card.bad { border-color: var(--rd); box-shadow: 0 0 30px rgba(255, 51, 85, .7); animation: cardShake .3s steps(5) 1; }
+#status { font-size: clamp(13px, 3.8vw, 18px); font-weight: 800; letter-spacing: .26em; color: var(--dim); min-height: 22px; }
+#status.go { color: var(--gr); text-shadow: 0 0 10px rgba(57, 255, 136, .6); }
+#slots { display: flex; gap: 8px; min-height: 14px; }
+#slots i { width: 14px; height: 14px; transform: rotate(45deg); outline: 1px solid #3a3d5c; outline-offset: -1px; }
+#slots i.cur { outline-color: var(--cy); }
+#slots i.on { background: var(--mg); box-shadow: 0 0 8px var(--mg); outline: none; }
+#timeBox { width: min(100%, 420px); height: 8px; background: #17123a; }
+#timeBar { height: 100%; width: 100%; transform-origin: left center; background: var(--cy); }
+#stage.warn #card { animation: warnBorder .3s steps(2) infinite; }
+@keyframes pop { from { transform: scale(.4); opacity: 0; } }
+@keyframes cardShake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+@media (orientation: landscape) and (max-height: 520px) { #card { height: 28vh; } }
+@media (prefers-reduced-motion: reduce) { #card.bad, #card svg { animation: none; } }
+</style>
+</head>
+<body class="padalways">
+<div id="app">
+  <header id="hud">
+    <div class="stats">
+      <div class="stat"><span class="lbl">SCORE</span><span class="val" id="score">0</span></div>
+      <div class="stat"><span class="lbl">BEST</span><span class="val" id="best">0</span></div>
+      <div class="stat"><span class="lbl">MULT</span><span class="val mag" id="mult">x1</span></div>
+      <div class="stat"><span class="lbl">LEVEL</span><span class="val" id="level">1</span></div>
+      <div class="stat"><span class="lbl">INTEGRITY</span><span class="val" id="lives" aria-label="lives"><i></i><i></i><i></i></span></div>
+    </div>
+    <div class="scramble" id="scrambleBox">
+      <span class="lbl" id="scrambleLbl">NEXT REWRITE</span>
+      <div class="bar"><div id="scrambleBar"></div></div>
+    </div>
+  </header>
+
+  <div id="main">
+    <div id="stage">
+      <div id="rule"><span class="lbl">ACTIVE RULE</span><b id="ruleName">ECHO</b><small id="ruleDesc"></small></div>
+      <div id="card"></div>
+      <div id="slots"></div>
+      <div id="status"></div>
+      <div id="timeBox"><div id="timeBar"></div></div>
+      <div id="banner" aria-live="polite"></div>
+    </div>
+    <div id="controls">
+      <div id="legend"></div>
+      <div id="pad">
+        <button class="pb" data-d="0" style="grid-area:u" aria-label="Up arrow"></button>
+        <button class="pb" data-d="3" style="grid-area:l" aria-label="Left arrow"></button>
+        <button class="pb" data-d="1" style="grid-area:r" aria-label="Right arrow"></button>
+        <button class="pb" data-d="2" style="grid-area:d" aria-label="Down arrow"></button>
+        <div class="hub" style="grid-area:c"></div>
+      </div>
+      <div id="sys">
+        <button id="btnPause" class="sb" aria-label="Pause">II</button>
+        <button id="btnMute" class="sb" aria-label="Toggle sound">SND</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="ovTitle" class="overlay show">
+    <div class="panel">
+      <h1 class="glitch" data-t="ECHO//LOCK">ECHO//LOCK</h1>
+      <p class="tag">NEURAL STRESS TEST 04</p>
+      <ul class="how">
+        <li><b class="cy">◆</b> Watch the arrows flash up one by one, then enter the sequence on the pad before the timer runs out.</li>
+        <li><b style="color:var(--yl)">◆</b> How you enter it depends on the <em>active rule</em>: same order, backwards, the opposite arrows, or both.</li>
+        <li><b class="mg">◆</b> Every 30–45 seconds the rule is <em>rewritten</em>. Sequences get longer and faster.</li>
+        <li><b class="rd">◆</b> A wrong arrow or a timeout costs integrity. Three and you are flatlined.</li>
+      </ul>
+      <button id="btnStart" class="cta">JACK IN</button>
+      <p class="keys">Keyboard: arrows or WASD · Space = pause · M = sound</p>
+      <a class="back" href="index.html">&lsaquo; ALL GAMES</a>
+    </div>
+  </section>
+
+  <section id="ovPause" class="overlay">
+    <div class="panel small">
+      <h2>PAUSED</h2>
+      <button id="btnResume" class="cta">RESUME</button>
+      <button id="btnQuit" class="toggle">ABORT RUN</button>
+    </div>
+  </section>
+
+  <section id="ovOver" class="overlay">
+    <div class="panel small">
+      <h2 class="glitch rd" data-t="FLATLINED">FLATLINED</h2>
+      <p id="newBest" class="newbest">NEW BEST</p>
+      <dl class="res" id="results"></dl>
+      <button id="btnAgain" class="cta">RUN AGAIN</button>
+      <button id="btnMenu" class="toggle">MAIN MENU</button>
+      <a class="back" href="index.html">&lsaquo; ALL GAMES</a>
+    </div>
+  </section>
+</div>
+<div id="fx" aria-hidden="true"></div>
+<script src="common.js"></script>
+<script src="echo.js"></script>
+</body>
+</html>
