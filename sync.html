@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#05010d">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="description" content="A cyberpunk one-button timing test: hit the moving marker inside the zone while the orbit keeps being disrupted.">
+<title>SYNC//PULSE</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2305010d'/%3E%3Cpath d='M16 4 28 16 16 28 4 16Z' fill='none' stroke='%2300f0ff' stroke-width='3'/%3E%3Crect x='13' y='13' width='6' height='6' fill='%23ff2bd6'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+<style>
+#stage { flex-direction: column; gap: clamp(6px, 2vh, 18px); padding: 8px 14px; }
+#banner { top: 40%; }
+#rule .lbl { display: block; }
+#banner { top: auto; bottom: 5%; font-size: clamp(16px, 4.6vw, 30px); }
+#main { cursor: pointer; }
+@media (orientation: landscape) and (max-height: 520px) { #ruleDesc { display: none; } #ruleName { font-size: 20px; } }
+</style>
+</head>
+<body class="nopad">
+<div id="app">
+  <header id="hud">
+    <div class="stats">
+      <div class="stat"><span class="lbl">SCORE</span><span class="val" id="score">0</span></div>
+      <div class="stat"><span class="lbl">BEST</span><span class="val" id="best">0</span></div>
+      <div class="stat"><span class="lbl">MULT</span><span class="val mag" id="mult">x1</span></div>
+      <div class="stat"><span class="lbl">LEVEL</span><span class="val" id="level">1</span></div>
+      <div class="stat"><span class="lbl">INTEGRITY</span><span class="val" id="lives" aria-label="lives"><i></i><i></i><i></i></span></div>
+    </div>
+    <div class="scramble" id="scrambleBox">
+      <span class="lbl" id="scrambleLbl">NEXT DISRUPTION</span>
+      <div class="bar"><div id="scrambleBar"></div></div>
+    </div>
+  </header>
+
+  <div id="main">
+    <div id="stage">
+      <div id="rule"><span class="lbl">ORBIT STATUS</span><b id="ruleName">NOMINAL</b><small id="ruleDesc"></small></div>
+      <canvas id="game" aria-label="Timing ring"></canvas>
+      <div id="banner" aria-live="polite"></div>
+    </div>
+    <div id="controls">
+      <div id="legend"></div>
+      <div id="pad">
+        <button class="pb" data-d="0" style="grid-area:u" aria-label="Up arrow"></button>
+        <button class="pb" data-d="3" style="grid-area:l" aria-label="Left arrow"></button>
+        <button class="pb" data-d="1" style="grid-area:r" aria-label="Right arrow"></button>
+        <button class="pb" data-d="2" style="grid-area:d" aria-label="Down arrow"></button>
+        <div class="hub" style="grid-area:c"></div>
+      </div>
+      <div id="sys">
+        <button id="btnPause" class="sb" aria-label="Pause">II</button>
+        <button id="btnMute" class="sb" aria-label="Toggle sound">SND</button>
+      </div>
+    </div>
+  </div>
+
+  <section id="ovTitle" class="overlay show">
+    <div class="panel">
+      <h1 class="glitch" data-t="SYNC//PULSE">SYNC//PULSE</h1>
+      <p class="tag">NEURAL STRESS TEST 06</p>
+      <ul class="how">
+        <li><b class="cy">◆</b> A marker orbits the ring. Tap <em>once</em> while it is inside the bright zone. The centre of the zone scores double.</li>
+        <li><b class="rd">◆</b> Tapping outside the zone, or letting the marker pass through it, costs integrity. Three and you are flatlined.</li>
+        <li><b class="mg">◆</b> Every 25–40 seconds the orbit is <em>disrupted</em>: it reverses, speeds up, goes dark near the zone, or the zone starts to slide.</li>
+      </ul>
+      <button id="btnStart" class="cta">JACK IN</button>
+      <p class="keys">Touch or mouse: tap anywhere · Keyboard: Space, Enter or any arrow<br>P = pause · M = sound</p>
+      <a class="back" href="index.html">&lsaquo; ALL GAMES</a>
+    </div>
+  </section>
+
+  <section id="ovPause" class="overlay">
+    <div class="panel small">
+      <h2>PAUSED</h2>
+      <button id="btnResume" class="cta">RESUME</button>
+      <button id="btnQuit" class="toggle">ABORT RUN</button>
+    </div>
+  </section>
+
+  <section id="ovOver" class="overlay">
+    <div class="panel small">
+      <h2 class="glitch rd" data-t="FLATLINED">FLATLINED</h2>
+      <p id="newBest" class="newbest">NEW BEST</p>
+      <dl class="res" id="results"></dl>
+      <button id="btnAgain" class="cta">RUN AGAIN</button>
+      <button id="btnMenu" class="toggle">MAIN MENU</button>
+      <a class="back" href="index.html">&lsaquo; ALL GAMES</a>
+    </div>
+  </section>
+</div>
+<div id="fx" aria-hidden="true"></div>
+<script src="common.js"></script>
+<script src="sync.js"></script>
+</body>
+</html>
